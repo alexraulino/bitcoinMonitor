@@ -36,8 +36,8 @@ public class MarketBitCoin {
 		Double media = 0.0;
 		Collections.sort(historicoValores, new comparadorBitCoin());
 		int t = 0;
-		if (historicoValores.size() > 15){
-			t = historicoValores.size() - 15;
+		if (historicoValores.size() > qtd){
+			t = historicoValores.size() - qtd;
 		}else{
 			t = 0;
 		}
