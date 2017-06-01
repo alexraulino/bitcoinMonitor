@@ -34,12 +34,17 @@ public class MarketBitCoin {
 	public Double getMedia(int qtd){
 		int x = 0;
 		Double media = 0.0;
-		for (ValorBitCoin vb : historicoValores) {
+		Collections.sort(historicoValores, new comparadorBitCoin());
+		int t = 0;
+		if (historicoValores.size() > 15){
+			t = historicoValores.size() - 15;
+		}else{
+			t = 0;
+		}
+		
+		for (int y = t; y < historicoValores.size(); y++) {		
+			media = media + historicoValores.get(y).getValorVenda() + historicoValores.get(y).getValorCompra();
 			x++;
-			media = media + vb.getValorVenda() + vb.getValorCompra();
-			if (x == qtd){
-				break;
-			}
 		}	
 		return media / (2 * x);
 	}
@@ -65,13 +70,16 @@ public class MarketBitCoin {
 		System.out.println("Market: " + nome);
 		System.out.println("+++++++++++++++++++++++++++++++++");
 		Collections.sort(historicoValores, new comparadorBitCoin());
-		int x = 0;
-		for (ValorBitCoin vb : historicoValores) {
-			x++;
-			System.out.println(vb);
-			if (x == 15){
-				break;
-			}
+		int t = 0;
+		
+		if (historicoValores.size() > 15){
+			t = historicoValores.size() - 15;
+		}else{
+			t = 0;
+		}
+		
+		for (int y = t; y < historicoValores.size(); y++) {			
+			System.out.println(historicoValores.get(y));		
 		}
 
 	}
