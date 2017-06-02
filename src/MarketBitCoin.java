@@ -80,7 +80,7 @@ public class MarketBitCoin {
 		}
 
 		for (int y = t; y < historicoValores.size(); y++) {
-			System.out.println(updatePrint(historicoValores.get(y)));
+			System.out.println(updatePrint(historicoValores.get(y), null));
 		}
 
 	}
@@ -113,12 +113,11 @@ public class MarketBitCoin {
 		Double vVenda, vCompra;
 		vVenda = getValorJSON(strVenda);
 		vCompra = getValorJSON(strCompra);
-		System.out.println(updatePrint(addValor(vVenda, vCompra)));
-		// ti.displayMessage("Teste", addValor(vVenda, vCompra).toString(),
-		// MessageType.INFO);
+		System.out.println(updatePrint(addValor(vVenda, vCompra), ti));
+
 	}
 
-	private String updatePrint(ValorBitCoin addValor) {
+	private String updatePrint(ValorBitCoin addValor, TrayIcon ti) {
 		if (ultimo == null) {
 			ultimo = addValor;
 			return addValor.toString();
@@ -137,9 +136,16 @@ public class MarketBitCoin {
 					xaux = xaux + "   ===";
 				}
 			}
+			
+			Double percentual = ((100 / ultimo.getValorCompra()) * addValor.getValorCompra()) - 100;
 
 			xaux = xaux + "  "
-					+ String.format("%1$,.2f", ((100 / ultimo.getValorCompra()) * addValor.getValorCompra()) - 100);
+					+ String.format("%1$,.2f", percentual);
+
+			if ((ti != null) && (percentual != 0.0))
+				ti.displayMessage("Mudou o Valor",
+						String.format("%1$,.2f", percentual),
+						MessageType.INFO);
 
 			ultimo = addValor;
 			return xaux;

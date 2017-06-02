@@ -30,7 +30,7 @@ public class BitCoinMonitor {
 //			PopupMenu popup = new PopupMenu();
 //			MenuItem item = new MenuItem("");
 //			popup.add(item);
-			TrayIcon trayIcon = new TrayIcon(image, "Texto de dica");
+			TrayIcon trayIcon = new TrayIcon(image, "MILHÕES");
 			trayIcon.setImageAutoSize(true);
 
 			try {
