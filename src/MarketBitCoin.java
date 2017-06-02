@@ -17,6 +17,7 @@ public class MarketBitCoin {
 
 	private String nome;
 	private ArrayList<ValorBitCoin> historicoValores = new ArrayList<ValorBitCoin>();
+	private ValorBitCoin ultimo = null;
 
 	public MarketBitCoin(String nome) {
 		super();
@@ -30,22 +31,22 @@ public class MarketBitCoin {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	
-	public Double getMedia(int qtd){
+
+	public Double getMedia(int qtd) {
 		int x = 0;
 		Double media = 0.0;
 		Collections.sort(historicoValores, new comparadorBitCoin());
 		int t = 0;
-		if (historicoValores.size() > qtd){
+		if (historicoValores.size() > qtd) {
 			t = historicoValores.size() - qtd;
-		}else{
+		} else {
 			t = 0;
 		}
-		
-		for (int y = t; y < historicoValores.size(); y++) {		
+
+		for (int y = t; y < historicoValores.size(); y++) {
 			media = media + historicoValores.get(y).getValorVenda() + historicoValores.get(y).getValorCompra();
 			x++;
-		}	
+		}
 		return media / (2 * x);
 	}
 
@@ -71,15 +72,15 @@ public class MarketBitCoin {
 		System.out.println("+++++++++++++++++++++++++++++++++");
 		Collections.sort(historicoValores, new comparadorBitCoin());
 		int t = 0;
-		
-		if (historicoValores.size() > 15){
+
+		if (historicoValores.size() > 15) {
 			t = historicoValores.size() - 15;
-		}else{
+		} else {
 			t = 0;
 		}
-		
-		for (int y = t; y < historicoValores.size(); y++) {			
-			System.out.println(historicoValores.get(y));		
+
+		for (int y = t; y < historicoValores.size(); y++) {
+			System.out.println(updatePrint(historicoValores.get(y)));
 		}
 
 	}
@@ -90,10 +91,10 @@ public class MarketBitCoin {
 			String[] valores = str.split("/");
 			valor1 = Double.valueOf(valores[0]);
 			valor2 = Double.valueOf(valores[1]);
-			if (valor2 > valor1){
-				return valor2 / valor1;	
-			}else {
-			return valor1 / valor2;
+			if (valor2 > valor1) {
+				return valor2 / valor1;
+			} else {
+				return valor1 / valor2;
 			}
 
 		} else {
@@ -112,8 +113,38 @@ public class MarketBitCoin {
 		Double vVenda, vCompra;
 		vVenda = getValorJSON(strVenda);
 		vCompra = getValorJSON(strCompra);
-		System.out.println(addValor(vVenda, vCompra) + " MP= " + String.format("%1$,.2f", getMedia(15)));
-//		ti.displayMessage("Teste", addValor(vVenda, vCompra).toString(), MessageType.INFO);
+		System.out.println(updatePrint(addValor(vVenda, vCompra)));
+		// ti.displayMessage("Teste", addValor(vVenda, vCompra).toString(),
+		// MessageType.INFO);
+	}
+
+	private String updatePrint(ValorBitCoin addValor) {
+		if (ultimo == null) {
+			ultimo = addValor;
+			return addValor.toString();
+
+		} else {
+			String xaux = addValor.toString();
+
+			if (ultimo.getValorCompra() < addValor.getValorCompra()) {
+				xaux = xaux + "   +++";
+			} else {
+				if (ultimo.getValorCompra() > addValor.getValorCompra()) {
+
+					xaux = xaux + "   ---";
+
+				} else {
+					xaux = xaux + "   ===";
+				}
+			}
+
+			xaux = xaux + "  "
+					+ String.format("%1$,.2f", ((100 / ultimo.getValorCompra()) * addValor.getValorCompra()) - 100);
+
+			ultimo = addValor;
+			return xaux;
+		}
+
 	}
 
 }
