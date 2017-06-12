@@ -136,16 +136,13 @@ public class MarketBitCoin {
 					xaux = xaux + "   ===";
 				}
 			}
-			
+
 			Double percentual = ((100 / ultimo.getValorCompra()) * addValor.getValorCompra()) - 100;
 
-			xaux = xaux + "  "
-					+ String.format("%1$,.2f", percentual);
+			xaux = xaux + "  " + String.format("%1$,.2f", percentual);
 
 			if ((ti != null) && (percentual != 0.0))
-				ti.displayMessage("Mudou o Valor",
-						String.format("%1$,.2f", percentual),
-						MessageType.INFO);
+				ti.displayMessage("Mudou o Valor", String.format("%1$,.2f", percentual), MessageType.INFO);
 
 			ultimo = addValor;
 			return xaux;

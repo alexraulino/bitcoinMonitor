@@ -10,10 +10,12 @@ public class ValorBitCoin {
 		this.valorVenda = valorVenda;
 		this.valorCompra = valorCompra;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Data: " + data + ", V=" + String.format("%1$,.2f", valorVenda)+ ", C=" + String.format("%1$,.2f", valorCompra) + ", M= " + String.format("%1$,.2f", (valorCompra +valorVenda)/2);
+		return "Data: " + data + ", V=" + String.format("%1$,.2f", valorVenda) + ", C="
+				+ String.format("%1$,.2f", valorCompra) + ", M= "
+				+ String.format("%1$,.2f", (valorCompra + valorVenda) / 2);
 	}
 
 	public String getData() {
@@ -23,7 +25,6 @@ public class ValorBitCoin {
 	public void setData(String data) {
 		this.data = data;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -66,5 +67,4 @@ public class ValorBitCoin {
 		this.valorCompra = valorCompra;
 	}
 
-	
 }
