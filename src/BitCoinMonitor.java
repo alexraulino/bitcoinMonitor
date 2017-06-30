@@ -73,7 +73,7 @@ public class BitCoinMonitor {
 				// portifolioBitCoin = new Gson().fromJson(reader,
 				// Portifolio.class);
 				// } else {
-				portifolioBitCoin = new Portifolio("Poliniex");
+				portifolioBitCoin = new Portifolio("Poliniex", args[1], args[2]);
 				// }
 
 				int x = 0;

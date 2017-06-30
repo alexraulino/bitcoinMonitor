@@ -42,17 +42,19 @@ import com.twelvemonkeys.lang.StringUtil;
 
 public class Portifolio {
 
-	private String API_KEY = "HI4CNKKM-5UHFWW2E-F1EQFY4H-UP0ZZ5Q7";
-	private String SECRETE_KEY = "37c6ff8d9f9fe70dcec35495ff57383b5ec3ac1f67aef6175749d613e7bfbe844e8720540943f2c91409319ad2fd7321817bc4e951639f1589deb74589a42023";
+	private String API_KEY = "";
+	private String SECRETE_KEY = "";
 
 	private String nomeMarket;
 	private HashMap<String, Moeda> moedas = new HashMap<>();
 	private Double BTC_entrada = 0.0;
 	private Double BTC_atual = 0.0;
 
-	public Portifolio(String nomeMarket) {
+	public Portifolio(String nomeMarket, String API_KEY, String SECRETE_KEY) {
 		super();
 		this.nomeMarket = nomeMarket;
+		this.API_KEY = API_KEY.substring(1, API_KEY.length());
+		this.SECRETE_KEY = SECRETE_KEY.substring(1, SECRETE_KEY.length());;
 	}
 
 	@Override
