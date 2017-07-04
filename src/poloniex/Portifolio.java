@@ -212,4 +212,9 @@ public class Portifolio {
 			e.printStackTrace();
 		}
 	}
+
+	public void registrarHistorico() {
+		// TODO Auto-generated method stub
+		
+	}
 }

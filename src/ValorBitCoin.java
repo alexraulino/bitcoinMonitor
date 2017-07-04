@@ -1,4 +1,4 @@
-package poloniex;
+
 public class ValorBitCoin {
 
 	private String data;

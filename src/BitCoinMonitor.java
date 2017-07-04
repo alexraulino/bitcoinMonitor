@@ -77,8 +77,8 @@ public class BitCoinMonitor {
 				while (true) {
 					portifolioBitCoin.updateValoresMoedas(xAtualizaQuantidade);
 					portifolioBitCoin.mostrarPortilofio();
-					xAtualizaQuantidade = false;
-					//Thread.sleep(5000);
+					portifolioBitCoin.registrarHistorico();
+					xAtualizaQuantidade = false;					
 				}
 
 			}

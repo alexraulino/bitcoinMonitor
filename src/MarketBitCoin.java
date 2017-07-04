@@ -13,8 +13,6 @@ import java.util.Comparator;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import poloniex.ValorBitCoin;
-
 public class MarketBitCoin {
 
 	private String nome;
