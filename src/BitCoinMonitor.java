@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
+import poloniex.Portifolio;
+
 public class BitCoinMonitor {
 
 	private static String URL_WEBSERVICE = "https://s3.amazonaws.com/data-production-walltime-info/production/dynamic/meta.json?now=1496234005679.1160540.0100000002";
@@ -59,51 +61,31 @@ public class BitCoinMonitor {
 						Gson gson = new GsonBuilder().create();
 						gson.toJson(marketBitCoin, writer);
 					}
-					Thread.sleep(60000);
+					
 				}
 			}
 
 			if (Arrays.asList(args).contains(MARKET_POLONIEX)) {
 
 				Portifolio portifolioBitCoin = null;
-				// File file = new File(NOME_ARQUIVO_PORTIFOLIO);
-				// if (file.exists()) {
-				// JsonReader reader = new JsonReader(new
-				// FileReader(NOME_ARQUIVO_PORTIFOLIO));
-				// portifolioBitCoin = new Gson().fromJson(reader,
-				// Portifolio.class);
-				// } else {
 				portifolioBitCoin = new Portifolio("Poliniex", args[1], args[2]);
-				// }
+				
+				portifolioBitCoin.updateDepositsWithdrawals();
+				portifolioBitCoin.updatePortifolio();
 
-				int x = 0;
-				int y = 0;
-
+				Boolean xAtualizaQuantidade = true;
 				while (true) {
-					if ((x == 30) || (x == 0)) {
-						portifolioBitCoin.update();
-					}
-					x++;
-
-					if ((y == 30) || (y == 0)) {
-						portifolioBitCoin.updateMoeda();
-					}
-					y++;
-					portifolioBitCoin.updateValoresMoedas();
+					portifolioBitCoin.updateValoresMoedas(xAtualizaQuantidade);
 					portifolioBitCoin.mostrarPortilofio();
-					// file.delete();
-					// try (Writer writer = new
-					// FileWriter(NOME_ARQUIVO_PORTIFOLIO)) {
-					// Gson gson = new GsonBuilder().create();
-					// gson.toJson(portifolioBitCoin, writer);
-					// }
+					xAtualizaQuantidade = false;
+					//Thread.sleep(5000);
 				}
 
 			}
 
 			System.out.println("Não foi selecionado a market");
 
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 

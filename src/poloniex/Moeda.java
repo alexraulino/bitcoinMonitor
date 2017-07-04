@@ -1,11 +1,12 @@
+package poloniex;
 import com.google.gson.JsonObject;
 
-public class Moeda {
+public class Moeda extends Object{
 
 	private String nome;
 	private Double quantidade;
 	private Double valor;
-	private Double ValorCompra;
+	private Double valorCompra;
 	private Double quantidadeBTC;
 
 	public String getNome() {
@@ -33,11 +34,11 @@ public class Moeda {
 	}
 
 	public Double getValorCompra() {
-		return ValorCompra;
+		return valorCompra;
 	}
 
 	public void setValorCompra(Double valorCompra) {
-		ValorCompra = valorCompra;
+		this.valorCompra = valorCompra;
 	}
 
 	public Double getQuantidadeBTC() {
@@ -55,19 +56,20 @@ public class Moeda {
 		this.quantidadeBTC = jsonObject.get("btcValue").getAsDouble();
 	}
 
-	public Moeda(String nome, Double quantidade, Double valor, Double valorCompra) {
+	public Moeda(String nome, Double quantidade, Double valor, Double valorCompra, Double quantidadeBTC) {
 		super();
 		this.nome = nome;
 		this.quantidade = quantidade;
 		this.valor = valor;
-		ValorCompra = valorCompra;
+		this.valorCompra = valorCompra;
+		this.quantidadeBTC = quantidadeBTC;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((ValorCompra == null) ? 0 : ValorCompra.hashCode());
+		result = prime * result + ((valorCompra == null) ? 0 : valorCompra.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		result = prime * result + ((quantidade == null) ? 0 : quantidade.hashCode());
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
@@ -83,10 +85,10 @@ public class Moeda {
 		if (getClass() != obj.getClass())
 			return false;
 		Moeda other = (Moeda) obj;
-		if (ValorCompra == null) {
-			if (other.ValorCompra != null)
+		if (valorCompra == null) {
+			if (other.valorCompra != null)
 				return false;
-		} else if (!ValorCompra.equals(other.ValorCompra))
+		} else if (!valorCompra.equals(other.valorCompra))
 			return false;
 		if (nome == null) {
 			if (other.nome != null)
@@ -108,9 +110,9 @@ public class Moeda {
 
 	@Override
 	public String toString() {
-		return String.format("%5s", nome) + " C=" + String.format("|%-15.8f", ValorCompra) + " V="
-				+ String.format("|%-15.8f", valor) + "D=" + String.format("|%-+15.8f", valor - ValorCompra) + "P="
-				+ String.format("|%-+12.2f", ((100 / ValorCompra) * valor) - 100);
+		return String.format("%5s", nome) + " C=" + String.format("|%-15.8f", valorCompra) + " V="
+				+ String.format("|%-15.8f", valor) + "D=" + String.format("|%-+15.8f", valor - valorCompra) + "P="
+				+ String.format("|%-+12.2f", ((100 / valorCompra) * valor) - 100);
 	}
 
 	public Double getQtdBTC() {
@@ -119,6 +121,11 @@ public class Moeda {
 			return quantidade;
 		}
 		return quantidade * valor;
+	}
+	
+	@Override
+	public Moeda clone() {
+		return new Moeda(nome, quantidade, valor, valorCompra, quantidadeBTC);
 	}
 
 }

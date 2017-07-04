@@ -1,6 +1,5 @@
-import java.awt.TrayIcon;
+package poloniex;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -13,14 +12,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.print.attribute.standard.RequestingUserName;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -31,25 +27,24 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.omg.CORBA.RepositoryIdHelper;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.twelvemonkeys.lang.StringUtil;
 
 public class Portifolio {
 
-	private String API_KEY = "";
-	private String SECRETE_KEY = "";
+	private static String API_KEY = "";
+	private static String SECRETE_KEY = "";
 
 	private String nomeMarket;
 	private HashMap<String, Moeda> moedas = new HashMap<>();
 	private Double BTC_entrada = 0.0;
 	private Double BTC_atual = 0.0;
-
+	
+	
 	public Portifolio(String nomeMarket, String API_KEY, String SECRETE_KEY) {
 		super();
 		this.nomeMarket = nomeMarket;
@@ -77,7 +72,7 @@ public class Portifolio {
 				"-------------------------------------------------------------------------------------");
 	}
 
-	public HttpEntity returnCommand(String command, ArrayList<SimpleEntry<String, String>> extraParams) {
+	public static HttpEntity returnCommand(String command, ArrayList<SimpleEntry<String, String>> extraParams) {
 		String url = "https://poloniex.com/tradingApi";
 		String nonce = String.valueOf(System.currentTimeMillis());
 		String queryArgs = "command=" + command + "&nonce=" + nonce;
@@ -118,7 +113,7 @@ public class Portifolio {
 
 	}
 
-	public HttpEntity returnPublic(String command) {
+	public static HttpEntity returnPublic(String command) {
 		String url = "https://poloniex.com/public?command=" + command;
 		try {
 			CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -133,8 +128,7 @@ public class Portifolio {
 
 	}
 
-	public void updateMoeda() {
-		BTC_atual = 0.0;
+	public void updatePortifolio() {
 		HttpEntity responseEntity = returnCommand("returnCompleteBalances", new ArrayList<>());
 		if (responseEntity == null) {
 			return;
@@ -147,7 +141,9 @@ public class Portifolio {
 				Moeda md = new Moeda(entry.getKey(), (JsonObject) entry.getValue());
 				if (md.getQuantidade() != 0) {
 					moedas.put(entry.getKey(), md);
-					atualizarValores(md);
+					taskUpdateMoeda tk = new taskUpdateMoeda(md, true);
+					tk.run();
+					md = tk.getMoeda();
 
 				} else {
 					moedas.remove(md.getNome());
@@ -160,75 +156,23 @@ public class Portifolio {
 		}
 	}
 
-	public void updateValoresMoedas() {
-		BTC_atual = 0.0;
+	public void updateValoresMoedas(Boolean xAtualizaQuantidade) {
+		ArrayList<taskUpdateMoeda> tasks = new ArrayList<>();
 		for (Moeda md : moedas.values()) {
-			atualizarValores(md);
+			taskUpdateMoeda tk = new taskUpdateMoeda(md, xAtualizaQuantidade);
+			tasks.add(tk);
+			tk.run();
 		}
-	}
-
-	private void atualizarValores(Moeda md) {
-
-		if (md.getNome().equalsIgnoreCase("BTC")) {
-			md.setValor(md.getQuantidade());
-			md.setValorCompra(md.getQuantidade());
+		
+		BTC_atual = 0.0;		
+		for (taskUpdateMoeda tk : tasks) {
+			Moeda md = tk.getMoeda(); 
 			BTC_atual += md.getQtdBTC();
-			return;
+			moedas.put(md.getNome(), md);
 		}
-		try {
-			String dateString = "09 Nov 2012 23:40:18";
-			DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
-			Date date = dateFormat.parse(dateString);
+	}	
 
-			long start = (long) date.getTime() / 1000;
-
-			String dateString2 = "09 Nov 2018 23:40:18";
-			DateFormat dateFormat2 = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
-			Date date2 = dateFormat2.parse(dateString2);
-			long stop = (long) date2.getTime() / 1000;
-
-			ArrayList<SimpleEntry<String, String>> extraParams = new ArrayList<>();
-			extraParams.add(new SimpleEntry<String, String>("currencyPair", "BTC_" + md.getNome().toUpperCase()));
-			extraParams.add(new SimpleEntry<String, String>("start", "" + start));
-			extraParams.add(new SimpleEntry<String, String>("end", "" + stop));
-			HttpEntity responseEntity = returnCommand("returnTradeHistory", extraParams);
-			if (responseEntity == null) {
-				return;
-			}
-			String aux = EntityUtils.toString(responseEntity);
-			JsonArray json = new Gson().fromJson(aux, JsonArray.class);
-			Iterator<JsonElement> ite = json.getAsJsonArray().iterator();
-			JsonObject eleUti = null;
-			while (ite.hasNext()) {
-				JsonObject ele = ite.next().getAsJsonObject();
-				if (ele.get("type").getAsString().equalsIgnoreCase("buy")) {
-					if (eleUti == null) {
-						md.setValorCompra(ele.get("rate").getAsDouble());
-						eleUti = ele;
-					} else if (ele.get("date").getAsString()
-							.compareToIgnoreCase(eleUti.get("date").getAsString()) >= 0) {
-						md.setValorCompra(ele.get("rate").getAsDouble());
-						eleUti = ele;
-					}
-
-				}
-			}
-
-			HttpEntity responseEntity2 = returnPublic("returnTicker");
-			if (responseEntity2 == null) {
-				return;
-			}
-			String aux1 = EntityUtils.toString(responseEntity2);
-			JsonObject json2 = new Gson().fromJson(aux1, JsonObject.class);
-			md.setValor(json2.get("BTC_" + md.getNome().toUpperCase()).getAsJsonObject().get("last").getAsDouble());
-			BTC_atual += md.getQtdBTC();
-		} catch (java.text.ParseException | JsonSyntaxException | ParseException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public void update() {
+	public void updateDepositsWithdrawals() {
 		try {
 			ArrayList<SimpleEntry<String, String>> extraParams = new ArrayList<>();
 			String dateString = "09 Nov 2012 23:40:18";
