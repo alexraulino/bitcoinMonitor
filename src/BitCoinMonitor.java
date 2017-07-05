@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Array;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -61,31 +63,40 @@ public class BitCoinMonitor {
 						Gson gson = new GsonBuilder().create();
 						gson.toJson(marketBitCoin, writer);
 					}
-					
+
 				}
 			}
 
 			if (Arrays.asList(args).contains(MARKET_POLONIEX)) {
 
 				Portifolio portifolioBitCoin = null;
-				portifolioBitCoin = new Portifolio("Poliniex", args[1], args[2]);
+				try {
+				DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 				
+				portifolioBitCoin = new Portifolio("Poliniex", args[1], args[2], DriverManager.getConnection("jdbc:mysql://db4free.net:3306/bitcoinmonitor?useSSL=false", "bitcoinmonitor",
+						"afr12481632"));
+
 				portifolioBitCoin.updateDepositsWithdrawals();
 				portifolioBitCoin.updatePortifolio();
+				
+					
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}
 
-				Boolean xAtualizaQuantidade = true;
+				boolean xAtualizaQuantidade = true;
 				while (true) {
 					portifolioBitCoin.updateValoresMoedas(xAtualizaQuantidade);
 					portifolioBitCoin.mostrarPortilofio();
 					portifolioBitCoin.registrarHistorico();
-					xAtualizaQuantidade = false;					
+					xAtualizaQuantidade = false;
 				}
 
 			}
 
 			System.out.println("Não foi selecionado a market");
 
-		} catch (IOException e) {
+		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		}
 
