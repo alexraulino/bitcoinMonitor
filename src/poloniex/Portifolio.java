@@ -35,7 +35,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -49,13 +48,37 @@ public class Portifolio {
 	private HashMap<String, Moeda> moedas = new HashMap<>();
 	private Double BTC_entrada = 0.0;
 	private Double BTC_atual = 0.0;
-	// private Connection conn;
+	private Connection conn;
 
 	public Portifolio(String nomeMarket, String API_KEY, String SECRETE_KEY, Connection conection) throws SQLException {
 		super();
 		this.nomeMarket = nomeMarket;
 		this.API_KEY = API_KEY.substring(1, API_KEY.length());
 		this.SECRETE_KEY = SECRETE_KEY.substring(1, SECRETE_KEY.length());
+		this.conn = conection;
+
+		Statement stmt = conn.createStatement();
+		String sql;
+		sql = "SELECT 1 FROM portifolio";
+		ResultSet rs = stmt.executeQuery(sql);
+		if (!rs.next()) {
+			// the mysql insert statement
+			String query = " insert into portifolio (nome, BTC_entrada)" + " values (?, ?)";
+
+			// create the mysql insert preparedstatement
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setString(1, nomeMarket);
+			preparedStmt.setDouble(2, 0.0);
+
+			// execute the preparedstatement
+			preparedStmt.execute();
+
+			preparedStmt.close();
+
+		}
+
+		rs.close();
+		stmt.close();
 
 	}
 
@@ -66,7 +89,19 @@ public class Portifolio {
 
 	public void mostrarPortilofio() throws SQLException {
 
+		// the mysql insert statement
+		String query = " insert into historicoPortifolio (BTC_atual, percentualGanho)" + " values (?, ?)";
+
+		// create the mysql insert preparedstatement
+		PreparedStatement preparedStmt = conn.prepareStatement(query);
+		preparedStmt.setDouble(1, BTC_atual);
 		Double percentual = ((100 / BTC_entrada) * (BTC_atual)) - 100;
+		preparedStmt.setDouble(2, percentual);
+
+		// execute the preparedstatement
+		preparedStmt.execute();
+
+		preparedStmt.close();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		Date hora = Calendar.getInstance().getTime();
@@ -75,6 +110,23 @@ public class Portifolio {
 						+ "%=" + String.format("|%-15.2f", percentual) + "  " + sdf.format(hora));
 		System.out.println("-------------------------------------------------------------------------------------");
 		for (Moeda md : moedas.values()) {
+
+			String query2 = " insert into historicoMoeda (nome, compra, venda, diferenca, percentual, vendido)"
+					+ " values (?, ?, ?, ?, ?, ?)";
+
+			// create the mysql insert preparedstatement
+			PreparedStatement preparedStmt2 = conn.prepareStatement(query2);
+			preparedStmt2.setString(1, md.getNome());
+			preparedStmt2.setDouble(2, md.getValorCompra());
+			preparedStmt2.setDouble(3, md.getValor());
+			preparedStmt2.setDouble(4, md.getValorCompra() - md.getValor());
+			preparedStmt2.setDouble(5, ((100 / md.getValorCompra()) * md.getValor()) - 100);
+			preparedStmt2.setString(6, "N");
+
+			// execute the preparedstatement
+			preparedStmt2.execute();
+
+			preparedStmt2.close();
 
 			System.out.println(md);
 		}
@@ -155,24 +207,26 @@ public class Portifolio {
 					md = tk.getMoeda();
 
 				} else {
-					
-//					String query = " inset into historicoPortifolio (vendido, nome)" + " values (?, ?)";
-//
-//					// create the mysql insert preparedstatement
-//					PreparedStatement preparedStmt = conn.prepareStatement(query);
-//					preparedStmt.setString(1, "S");
-//					preparedStmt.setString(2, md.getNome());
-//					
-//					// execute the preparedstatement			
-//					preparedStmt.execute();
-//					
-//					preparedStmt.close();
-					
+
+					// String query = " inset into historicoPortifolio (vendido,
+					// nome)" + " values (?, ?)";
+					//
+					// // create the mysql insert preparedstatement
+					// PreparedStatement preparedStmt =
+					// conn.prepareStatement(query);
+					// preparedStmt.setString(1, "S");
+					// preparedStmt.setString(2, md.getNome());
+					//
+					// // execute the preparedstatement
+					// preparedStmt.execute();
+					//
+					// preparedStmt.close();
+
 					moedas.remove(md.getNome());
 				}
 			}
 
-		} catch (JsonSyntaxException | ParseException | IOException e ) {
+		} catch (JsonSyntaxException | ParseException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -229,7 +283,20 @@ public class Portifolio {
 				BTC_entrada -= ele.getAsJsonObject().get("amount").getAsDouble();
 			}
 
-		} catch (ParseException | IOException | java.text.ParseException e) {
+			// the mysql insert statement
+			String query = " update portifolio set BTC_entrada = ? where nome = ?";
+
+			// create the mysql insert preparedstatement
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setString(2, nomeMarket);
+			preparedStmt.setDouble(1, BTC_entrada);
+
+			// execute the preparedstatement
+			preparedStmt.execute();
+
+			preparedStmt.close();
+
+		} catch (ParseException | IOException | java.text.ParseException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

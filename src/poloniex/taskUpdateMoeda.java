@@ -3,10 +3,10 @@ package poloniex;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.AbstractMap.SimpleEntry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;

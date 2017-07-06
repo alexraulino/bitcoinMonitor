@@ -1,7 +1,5 @@
 import java.awt.AWTException;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -10,16 +8,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Array;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
+import banco.Banco;
 import poloniex.Portifolio;
 
 public class BitCoinMonitor {
@@ -71,16 +67,13 @@ public class BitCoinMonitor {
 
 				Portifolio portifolioBitCoin = null;
 				try {
-				DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-				
-				portifolioBitCoin = new Portifolio("Poliniex", args[1], args[2], DriverManager.getConnection("jdbc:mysql://db4free.net:3306/bitcoinmonitor?useSSL=false", "bitcoinmonitor",
-						"afr12481632"));
 
-				portifolioBitCoin.updateDepositsWithdrawals();
-				portifolioBitCoin.updatePortifolio();
-				
-					
-				} catch (SQLException e) {
+					portifolioBitCoin = new Portifolio("Poliniex", args[1], args[2], Banco.abrir());
+
+					portifolioBitCoin.updateDepositsWithdrawals();
+					portifolioBitCoin.updatePortifolio();
+
+				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 
@@ -90,13 +83,14 @@ public class BitCoinMonitor {
 					portifolioBitCoin.mostrarPortilofio();
 					portifolioBitCoin.registrarHistorico();
 					xAtualizaQuantidade = false;
+					Thread.sleep(6000);
 				}
 
 			}
 
 			System.out.println("Não foi selecionado a market");
 
-		} catch (IOException | SQLException e) {
+		} catch (IOException | SQLException | InterruptedException e) {
 			e.printStackTrace();
 		}
 

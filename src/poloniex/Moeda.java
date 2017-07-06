@@ -1,7 +1,8 @@
 package poloniex;
+
 import com.google.gson.JsonObject;
 
-public class Moeda extends Object{
+public class Moeda extends Object {
 
 	private String nome;
 	private Double quantidade;
@@ -122,7 +123,7 @@ public class Moeda extends Object{
 		}
 		return quantidade * valor;
 	}
-	
+
 	@Override
 	public Moeda clone() {
 		return new Moeda(nome, quantidade, valor, valorCompra, quantidadeBTC);
