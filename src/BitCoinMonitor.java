@@ -11,11 +11,15 @@ import java.io.Writer;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import org.jfree.ui.RefineryUtilities;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import banco.Banco;
+import chart.BitCoinMonitorChart;
+import chart.taskUpdateChart;
 import poloniex.Portifolio;
 
 public class BitCoinMonitor {
@@ -26,6 +30,7 @@ public class BitCoinMonitor {
 
 	private static String MARKET_WALLTIME = "-WALLTIME";
 	private static String MARKET_POLONIEX = "-POLONIEX";
+	private static String MARKET_POLONIEX_CHART = "-POLONIEXCHART";
 
 	public static void main(String[] args) {
 		try {
@@ -86,6 +91,16 @@ public class BitCoinMonitor {
 					Thread.sleep(6000);
 				}
 
+			}
+
+			if (Arrays.asList(args).contains(MARKET_POLONIEX_CHART)) {
+				final String title = "BitCoinMonitor";
+				final BitCoinMonitorChart demo = new BitCoinMonitorChart(title);
+				demo.pack();
+				RefineryUtilities.positionFrameRandomly(demo);
+				demo.setVisible(true);
+				taskUpdateChart tk = new taskUpdateChart(demo.tm);
+				tk.run();
 			}
 
 			System.out.println("Não foi selecionado a market");
