@@ -53,32 +53,43 @@ public class Portifolio {
 	public Portifolio(String nomeMarket, String API_KEY, String SECRETE_KEY, Connection conection) throws SQLException {
 		super();
 		this.nomeMarket = nomeMarket;
-		this.API_KEY = API_KEY.substring(1, API_KEY.length());
-		this.SECRETE_KEY = SECRETE_KEY.substring(1, SECRETE_KEY.length());
+		Portifolio.API_KEY = API_KEY.substring(1, API_KEY.length());
+		Portifolio.SECRETE_KEY = SECRETE_KEY.substring(1, SECRETE_KEY.length());
 		this.conn = conection;
 
 		Statement stmt = conn.createStatement();
-		String sql;
-		sql = "SELECT 1 FROM portifolio";
-		ResultSet rs = stmt.executeQuery(sql);
-		if (!rs.next()) {
-			// the mysql insert statement
-			String query = " insert into portifolio (nome, BTC_entrada)" + " values (?, ?)";
+		try {
 
-			// create the mysql insert preparedstatement
-			PreparedStatement preparedStmt = conn.prepareStatement(query);
-			preparedStmt.setString(1, nomeMarket);
-			preparedStmt.setDouble(2, 0.0);
+			String sql;
+			sql = "SELECT 1 FROM portifolio";
+			ResultSet rs = stmt.executeQuery(sql);
+			try {
 
-			// execute the preparedstatement
-			preparedStmt.execute();
+				if (!rs.next()) {
+					// the mysql insert statement
+					String query = " insert into portifolio (nome, BTC_entrada)" + " values (?, ?)";
 
-			preparedStmt.close();
+					// create the mysql insert preparedstatement
+					PreparedStatement preparedStmt = conn.prepareStatement(query);
+					try {
 
+						preparedStmt.setString(1, nomeMarket);
+						preparedStmt.setDouble(2, 0.0);
+
+						// execute the preparedstatement
+						preparedStmt.execute();
+					} finally {
+						preparedStmt.close();
+					}
+
+				}
+			} finally {
+				rs.close();
+			}
+
+		} finally {
+			stmt.close();
 		}
-
-		rs.close();
-		stmt.close();
 
 	}
 
@@ -89,48 +100,54 @@ public class Portifolio {
 
 	public void mostrarPortilofio() throws SQLException {
 
-		// the mysql insert statement
-		String query = " insert into historicoPortifolio (BTC_atual, percentualGanho)" + " values (?, ?)";
+		try {
 
-		// create the mysql insert preparedstatement
-		PreparedStatement preparedStmt = conn.prepareStatement(query);
-		preparedStmt.setDouble(1, BTC_atual);
-		Double percentual = ((100 / BTC_entrada) * (BTC_atual)) - 100;
-		preparedStmt.setDouble(2, percentual);
-
-		// execute the preparedstatement
-		preparedStmt.execute();
-
-		preparedStmt.close();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-		Date hora = Calendar.getInstance().getTime();
-		System.out.println(
-				"      E=" + String.format("|%-15.8f", BTC_entrada) + " A=" + String.format("|%-15.8f", BTC_atual)
-						+ "%=" + String.format("|%-15.2f", percentual) + "  " + sdf.format(hora));
-		System.out.println("-------------------------------------------------------------------------------------");
-		for (Moeda md : moedas.values()) {
-
-			String query2 = " insert into historicoMoeda (nome, compra, venda, diferenca, percentual, vendido)"
-					+ " values (?, ?, ?, ?, ?, ?)";
+			// the mysql insert statement
+			String query = " insert into historicoPortifolio (BTC_atual, percentualGanho)" + " values (?, ?)";
 
 			// create the mysql insert preparedstatement
-			PreparedStatement preparedStmt2 = conn.prepareStatement(query2);
-			preparedStmt2.setString(1, md.getNome());
-			preparedStmt2.setDouble(2, md.getValorCompra());
-			preparedStmt2.setDouble(3, md.getValor());
-			preparedStmt2.setDouble(4, md.getValorCompra() - md.getValor());
-			preparedStmt2.setDouble(5, ((100 / md.getValorCompra()) * md.getValor()) - 100);
-			preparedStmt2.setString(6, "N");
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			try {
 
-			// execute the preparedstatement
-			preparedStmt2.execute();
+				preparedStmt.setDouble(1, BTC_atual);
+				Double percentual = ((100 / BTC_entrada) * (BTC_atual)) - 100;
+				preparedStmt.setDouble(2, percentual);
 
-			preparedStmt2.close();
+				// execute the preparedstatement
+				preparedStmt.execute();
+			} finally {
+				preparedStmt.close();
+			}
 
-			System.out.println(md);
+			for (Moeda md : moedas.values()) {
+
+				String query2 = " insert into historicoMoeda (nome, compra, venda, diferenca, percentual, vendido)"
+						+ " values (?, ?, ?, ?, ?, ?)";
+
+				// create the mysql insert preparedstatement
+				PreparedStatement preparedStmt2 = conn.prepareStatement(query2);
+				try {
+					preparedStmt2.setString(1, md.getNome());
+					preparedStmt2.setDouble(2, md.getValorCompra());
+					preparedStmt2.setDouble(3, md.getValor());
+					preparedStmt2.setDouble(4, md.getValorCompra() - md.getValor());
+					preparedStmt2.setDouble(5, ((100 / md.getValorCompra()) * md.getValor()) - 100);
+					preparedStmt2.setString(6, "N");
+
+					// execute the preparedstatement
+					preparedStmt2.setQueryTimeout(60000);
+					preparedStmt2.execute();
+
+				} finally {
+					preparedStmt2.close();
+				}
+			}
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			Date hora = Calendar.getInstance().getTime();
+			System.out.println("Hora Atualizacao " + sdf.format(hora));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		System.out.println("-------------------------------------------------------------------------------------");
 	}
 
 	public static HttpEntity returnCommand(String command, ArrayList<SimpleEntry<String, String>> extraParams) {
@@ -237,7 +254,7 @@ public class Portifolio {
 		for (Moeda md : moedas.values()) {
 			taskUpdateMoeda tk = new taskUpdateMoeda(md, xAtualizaQuantidade);
 			tasks.add(tk);
-			tk.run();
+			tk.start();
 		}
 
 		BTC_atual = 0.0;
@@ -255,12 +272,12 @@ public class Portifolio {
 			DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
 			Date date = dateFormat.parse(dateString);
 
-			long start = (long) date.getTime() / 1000;
+			long start = date.getTime() / 1000;
 
 			String dateString2 = "09 Nov 2018 23:40:18";
 			DateFormat dateFormat2 = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
 			Date date2 = dateFormat2.parse(dateString2);
-			long stop = (long) date2.getTime() / 1000;
+			long stop = date2.getTime() / 1000;
 			extraParams.add(new SimpleEntry<String, String>("start", "" + start));
 			extraParams.add(new SimpleEntry<String, String>("end", "" + stop));
 			HttpEntity responseEntity2 = returnCommand("returnDepositsWithdrawals", extraParams);
@@ -288,13 +305,16 @@ public class Portifolio {
 
 			// create the mysql insert preparedstatement
 			PreparedStatement preparedStmt = conn.prepareStatement(query);
-			preparedStmt.setString(2, nomeMarket);
-			preparedStmt.setDouble(1, BTC_entrada);
+			try {
 
-			// execute the preparedstatement
-			preparedStmt.execute();
+				preparedStmt.setString(2, nomeMarket);
+				preparedStmt.setDouble(1, BTC_entrada);
 
-			preparedStmt.close();
+				// execute the preparedstatement
+				preparedStmt.execute();
+			} finally {
+				preparedStmt.close();
+			}
 
 		} catch (ParseException | IOException | java.text.ParseException | SQLException e) {
 			// TODO Auto-generated catch block

@@ -18,16 +18,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import banco.Banco;
-import chart.BitCoinMonitorChart;
-import chart.taskUpdateChart;
+import chart.BitCoinMonitorDashBoard;
+import chart.taskUpdatePortifolio;
 import poloniex.Portifolio;
 
 public class BitCoinMonitor {
 
 	private static String URL_WEBSERVICE = "https://s3.amazonaws.com/data-production-walltime-info/production/dynamic/meta.json?now=1496234005679.1160540.0100000002";
 	private static String NOME_ARQUIVO_HISTORICO = "BITCOIN_HISTORICO.bitCoin";
-	private static String NOME_ARQUIVO_PORTIFOLIO = "BITCOIN_PORTIFOLIO.bitCoin";
-
 	private static String MARKET_WALLTIME = "-WALLTIME";
 	private static String MARKET_POLONIEX = "-POLONIEX";
 	private static String MARKET_POLONIEX_CHART = "-POLONIEXCHART";
@@ -95,16 +93,14 @@ public class BitCoinMonitor {
 
 			if (Arrays.asList(args).contains(MARKET_POLONIEX_CHART)) {
 				final String title = "BitCoinMonitor";
-				final BitCoinMonitorChart demo = new BitCoinMonitorChart(title);
+				final BitCoinMonitorDashBoard demo = new BitCoinMonitorDashBoard(title);
 				demo.pack();
 				RefineryUtilities.positionFrameRandomly(demo);
 				demo.setVisible(true);
-				taskUpdateChart tk = new taskUpdateChart(demo.tm);
-				tk.run();
+
+				taskUpdatePortifolio tk2 = new taskUpdatePortifolio(BitCoinMonitorDashBoard.pn);
+				tk2.start();
 			}
-
-			System.out.println("Não foi selecionado a market");
-
 		} catch (IOException | SQLException | InterruptedException e) {
 			e.printStackTrace();
 		}

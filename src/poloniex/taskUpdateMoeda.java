@@ -41,6 +41,7 @@ public class taskUpdateMoeda extends Thread {
 	@Override
 	public void run() {
 		Moeda clone = moeda.clone();
+		String aux = "";
 
 		if (moeda.getNome().equalsIgnoreCase("BTC")) {
 			moeda.setValor(moeda.getQuantidade());
@@ -53,12 +54,12 @@ public class taskUpdateMoeda extends Thread {
 				DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
 				Date date = dateFormat.parse(dateString);
 
-				long start = (long) date.getTime() / 1000;
+				long start = date.getTime() / 1000;
 
 				String dateString2 = "09 Nov 2018 23:40:18";
 				DateFormat dateFormat2 = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
 				Date date2 = dateFormat2.parse(dateString2);
-				long stop = (long) date2.getTime() / 1000;
+				long stop = date2.getTime() / 1000;
 
 				ArrayList<SimpleEntry<String, String>> extraParams = new ArrayList<>();
 				extraParams
@@ -69,7 +70,7 @@ public class taskUpdateMoeda extends Thread {
 				if (responseEntity == null) {
 					return;
 				}
-				String aux = EntityUtils.toString(responseEntity);
+				aux = EntityUtils.toString(responseEntity);
 				JsonArray json = new Gson().fromJson(aux, JsonArray.class);
 				Iterator<JsonElement> ite = json.getAsJsonArray().iterator();
 				JsonObject eleUti = null;
@@ -99,6 +100,7 @@ public class taskUpdateMoeda extends Thread {
 					json2.get("BTC_" + moeda.getNome().toUpperCase()).getAsJsonObject().get("last").getAsDouble());
 		} catch (java.text.ParseException | JsonSyntaxException | ParseException | IOException e) {
 			// TODO Auto-generated catch block
+			System.out.println(aux);
 			e.printStackTrace();
 			moeda = clone;
 		}
