@@ -1,8 +1,15 @@
 package chart;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import banco.Banco;
 
@@ -34,6 +41,21 @@ public class taskUpdatePortifolio extends Thread {
 						while (rs3.next()) {
 							pn.setMoeda(rs3.getString("nome"), rs3.getDouble("compra"), rs3.getDouble("venda"),
 									rs3.getDouble("diferenca"), rs3.getDouble("percentual"));
+
+							if (rs3.getDouble("percentual") >= 10.0) {
+								String msg = rs3.getString("nome") + rs3.getDouble("percentual");
+								String url = "http://gatemonito.000webhostapp.com/GCM/send_push_notification_message.php?regId=APA91bFvaROHsLNEHE33oTPvfyu5T9aGeRCvSeD0g5jl-6AzpEpNXhPdeBUwcqcfTs0YIfoidfKVWDqfM6jzlr42pkOBanz6bWV_SonD_p97QPVe6EfikSVUCMdcMWo9VnbSP931wuoH&message="
+										+ msg;
+								try {
+									CloseableHttpClient httpClient = HttpClients.createDefault();
+									HttpPost post = new HttpPost(url);
+									CloseableHttpResponse response = httpClient.execute(post);
+									System.out.println(EntityUtils.toString(response.getEntity()));
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
 
 						}
 					} finally {
