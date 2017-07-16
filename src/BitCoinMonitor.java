@@ -18,8 +18,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import banco.Banco;
-import chart.BitCoinMonitorDashBoard;
-import chart.taskUpdatePortifolio;
+import dashboard.BitCoinMonitorDashBoard;
+import dashboard.taskUpdatePortifolio;
 import poloniex.Portifolio;
 
 public class BitCoinMonitor {
@@ -28,13 +28,13 @@ public class BitCoinMonitor {
 	private static String NOME_ARQUIVO_HISTORICO = "BITCOIN_HISTORICO.bitCoin";
 	private static String MARKET_WALLTIME = "-WALLTIME";
 	private static String MARKET_POLONIEX = "-POLONIEX";
-	private static String MARKET_POLONIEX_CHART = "-POLONIEXCHART";
+	private static String MARKET_POLONIEX_DASH = "-POLONIEXDASH";
 
 	public static void main(String[] args) {
 		try {
 			SystemTray tray = SystemTray.getSystemTray();
 			Image image = Toolkit.getDefaultToolkit().getImage("bitcoin.png");
-			TrayIcon trayIcon = new TrayIcon(image, "MILHÕES");
+			TrayIcon trayIcon = new TrayIcon(image, "BitCoin Monitor");
 			trayIcon.setImageAutoSize(true);
 
 			try {
@@ -91,7 +91,7 @@ public class BitCoinMonitor {
 
 			}
 
-			if (Arrays.asList(args).contains(MARKET_POLONIEX_CHART)) {
+			if (Arrays.asList(args).contains(MARKET_POLONIEX_DASH)) {
 				final String title = "BitCoinMonitor";
 				final BitCoinMonitorDashBoard demo = new BitCoinMonitorDashBoard(title);
 				demo.pack();
