@@ -43,7 +43,7 @@ public class taskUpdateMoeda extends Thread {
 		Moeda clone = moeda.clone();
 		String aux = "";
 
-		if (moeda.getNome().equalsIgnoreCase("BTC")) {
+		if (moeda.getNome().equalsIgnoreCase("BTC") || moeda.getNome().equalsIgnoreCase("BCH")) {
 			moeda.setValor(moeda.getQuantidade());
 			moeda.setValorCompra(moeda.getQuantidade());
 			return;

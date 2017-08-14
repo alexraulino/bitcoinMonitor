@@ -35,6 +35,9 @@ public class Moeda extends Object {
 	}
 
 	public Double getValorCompra() {
+		if (valorCompra == null){
+			valorCompra = 0.0;
+		}
 		return valorCompra;
 	}
 
