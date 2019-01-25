@@ -43,7 +43,7 @@ public class taskUpdateMoeda extends Thread {
 		Moeda clone = moeda.clone();
 		String aux = "";
 
-		if (moeda.getNome().equalsIgnoreCase("BTC") || moeda.getNome().equalsIgnoreCase("BCH")) {
+		if (moeda.getNome().equalsIgnoreCase("BTC")) {
 			moeda.setValor(moeda.getQuantidade());
 			moeda.setValorCompra(moeda.getQuantidade());
 			return;
@@ -56,7 +56,7 @@ public class taskUpdateMoeda extends Thread {
 
 				long start = date.getTime() / 1000;
 
-				String dateString2 = "09 Nov 2018 23:40:18";
+				String dateString2 = "09 Nov 2019 23:40:18";
 				DateFormat dateFormat2 = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
 				Date date2 = dateFormat2.parse(dateString2);
 				long stop = date2.getTime() / 1000;
@@ -77,6 +77,13 @@ public class taskUpdateMoeda extends Thread {
 				while (ite.hasNext()) {
 					JsonObject ele = ite.next().getAsJsonObject();
 					if (ele.get("type").getAsString().equalsIgnoreCase("buy")) {
+						
+						if (moeda.getNome().equalsIgnoreCase("DCR")) {
+							if (ele.get("amount").getAsFloat() == Float.parseFloat("0.23407581")){
+								moeda.setValorCompra(ele.get("rate").getAsDouble());	
+							}
+						} else {
+						
 						if (eleUti == null) {
 							moeda.setValorCompra(ele.get("rate").getAsDouble());
 							eleUti = ele;
@@ -84,7 +91,7 @@ public class taskUpdateMoeda extends Thread {
 								.compareToIgnoreCase(eleUti.get("date").getAsString()) >= 0) {
 							moeda.setValorCompra(ele.get("rate").getAsDouble());
 							eleUti = ele;
-						}
+						}}
 
 					}
 				}
