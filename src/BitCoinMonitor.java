@@ -3,8 +3,6 @@ import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Arrays;
 
 import poloniex.Portifolio;
